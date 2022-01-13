@@ -13,7 +13,7 @@
 #define CHAT_ID "1234567890"
 
 WiFiClientSecure client;
-TelegramBotWrapper telegram(BOTtoken, client);
+TelegramBotWrapper telegram(BOTtoken, client, CHAT_ID);
 
 void handle_menu(cb_param_t *ptr)
 {
@@ -65,8 +65,6 @@ void setup()
   Serial.println("WiFi connected");
   Serial.printf("IP address: %s\n", WiFi.localIP().toString().c_str());
 
-  // Calling the begin method once at setup with the right chat_id is MANDATORY
-  telegram.begin(client, CHAT_ID);
   telegram.send("", String("WiFi connected\nIP address: ")+WiFi.localIP().toString());
 
   telegram_cmd_cb_t telegram_cmd_cb[] {

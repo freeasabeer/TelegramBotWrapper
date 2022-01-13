@@ -1,15 +1,12 @@
 #include <String>
 #include "TelegramBotWrapper.h"
 
-#define BOT_MTBS 5000 
-
-/*
-TelegramBotWrapper::TelegramBotWrapper(const String &token, const String &chat_id) {
-  UniversalTelegramBot bot(token, this->_client);
-  this-> = &bot;
-  this->_chat_id = chat_id;
-}
-*/
+TelegramBotWrapper::TelegramBotWrapper(const String &token, WiFiClientSecure &client, const String &chat_id):UniversalTelegramBot(token, client)
+  {
+    this->_chat_id = chat_id;
+    this->_client = &client;
+    client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
+  }
 
 // Private functions
 void TelegramBotWrapper::handleNewMessages(int numNewMessages)
@@ -60,22 +57,17 @@ void TelegramBotWrapper::set_mtbs(unsigned long mtbs){
   this->_mtbs = mtbs;
 }
 
-void TelegramBotWrapper::begin(WiFiClientSecure &client, const String &chat_id) {
-  client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
-  this->_chat_id = chat_id;
-}
-
 bool TelegramBotWrapper::register_single(const char *cmd, void (*cb)(cb_param_t *param))
 {
   static int nb_cb = 0;
   telegram_cmd_cb_t *ptr;
 
   if (nb_cb == 0)
-    telegram_cmd_cb = (telegram_cmd_cb_t **)malloc(2*sizeof(telegram_cmd_cb_t *));
+    this->telegram_cmd_cb = (telegram_cmd_cb_t **)malloc(2*sizeof(telegram_cmd_cb_t *));
   else
-    telegram_cmd_cb = (telegram_cmd_cb_t **)realloc(telegram_cmd_cb, (nb_cb+2)*sizeof(telegram_cmd_cb_t *));
+    this->telegram_cmd_cb = (telegram_cmd_cb_t **)realloc(this->telegram_cmd_cb, (nb_cb+2)*sizeof(telegram_cmd_cb_t *));
 
-  if(!telegram_cmd_cb)
+  if(!this->telegram_cmd_cb)
     return false;
 
   ptr = (telegram_cmd_cb_t *)malloc(sizeof(telegram_cmd_cb_t));
@@ -83,27 +75,29 @@ bool TelegramBotWrapper::register_single(const char *cmd, void (*cb)(cb_param_t 
   if(!ptr)
     return false;
 
-  telegram_cmd_cb[nb_cb] = ptr;
-  telegram_cmd_cb[nb_cb+1] = nullptr;
+  this->telegram_cmd_cb[nb_cb] = ptr;
+  this->telegram_cmd_cb[nb_cb+1] = nullptr;
 
   ptr->cmd = cmd;
   ptr->cb = cb;
 
-  //Serial.printf("[%d] cmd: %s -> cb: 0x%08X\n", nb_cb, telegram_cmd_cb[nb_cb]->cmd, (unsigned int)telegram_cmd_cb[nb_cb]->cb);
+  //Serial.printf("[%d] cmd: %s -> cb: 0x%08X\n", nb_cb, this->telegram_cmd_cb[nb_cb]->cmd, (unsigned int)this->telegram_cmd_cb[nb_cb]->cb);
 
   nb_cb++;
 
   return true;
 }
+
 /*
 void TelegramBotWrapper::check() {
     int j = 0;
-      while(telegram_cmd_cb[j] != nullptr) {
-        Serial.printf("[%d] cmd: %s -> cb: 0x%08X\n", j, telegram_cmd_cb[j]->cmd, (unsigned int)telegram_cmd_cb[j]->cb);
+      while(this->telegram_cmd_cb[j] != nullptr) {
+        Serial.printf("[%d] cmd: %s -> cb: 0x%08X\n", j, this->telegram_cmd_cb[j]->cmd, (unsigned int)this->telegram_cmd_cb[j]->cb);
         j++;
     }
 }
 */
+
 bool TelegramBotWrapper::register_bundle(telegram_cmd_cb_t *ptr) {
   bool status = true;
 
@@ -136,16 +130,13 @@ void TelegramBotWrapper::handle(void) {
   }
 }
 
-UniversalTelegramBot *TelegramBotWrapper::get_bot(void) {
-  return this;
+String TelegramBotWrapper::get_chat_id(void) {
+  return this->_chat_id;
 }
-String *TelegramBotWrapper::get_chat_id(void) {
-  return &(this->_chat_id);
-}
+
 void TelegramBotWrapper::set_chat_id(const String &chat_id) {
     this->_chat_id = chat_id;
 }
-
 
 void TelegramBotWrapper::send(const String &chat_id, const String &message) {
   if (chat_id == "")
