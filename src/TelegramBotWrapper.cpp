@@ -1,7 +1,7 @@
 #include <String>
 #include "TelegramBotWrapper.h"
 
-#define BOT_MTBS 5000 // mean time between scan messages
+#define BOT_MTBS 5000 
 
 /*
 TelegramBotWrapper::TelegramBotWrapper(const String &token, const String &chat_id) {
@@ -55,6 +55,10 @@ void TelegramBotWrapper::handleNewMessages(int numNewMessages)
 }
 
 // public functions
+
+void TelegramBotWrapper::set_mtbs(unsigned long mtbs){
+  this->_mtbs = mtbs;
+}
 
 void TelegramBotWrapper::begin(WiFiClientSecure &client, const String &chat_id) {
   client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
@@ -116,7 +120,7 @@ bool TelegramBotWrapper::register_bundle(telegram_cmd_cb_t *ptr) {
 void TelegramBotWrapper::handle(void) {
   static bool firstTime = true;
   static unsigned long bot_lasttime = 0;
-  if (millis() - bot_lasttime > BOT_MTBS) {
+  if (millis() - bot_lasttime > this->_mtbs) {
     int numNewMessages = this->getUpdates(this->last_message_received + 1);
 
     while (numNewMessages) {

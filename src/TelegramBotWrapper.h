@@ -28,13 +28,14 @@ public:
   void set_chat_id(const String &chat_id);
   String *get_chat_id(void);
   void sendKeyboard(const String &chat_id, const String &text, const String &keyboard);
-
+  void set_mtbs(unsigned long mtbs);
 
 private:
   //WiFiClientSecure _client;
   //UniversalTelegramBot *_bot;
   telegram_cmd_cb_t **telegram_cmd_cb = nullptr;
   String _chat_id;
+  unsigned long _mtbs = 5000; // mean time between scan messages
 
   void handleNewMessages(int numNewMessages);
   //void check(void);
