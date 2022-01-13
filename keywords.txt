@@ -1,0 +1,24 @@
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+cb_param_t          KEYWORD1
+telegram_cmd_cb_t   KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+TelegramBotWrapper      KEYWORD2
+begin	KEYWORD2
+send	KEYWORD2
+handle	KEYWORD2
+register_single	KEYWORD2
+register_bundle	KEYWORD2
+get_bot	KEYWORD2
+set_chat_id	KEYWORD2
+get_chat_id	KEYWORD2
+sendKeyboard	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
